@@ -1,12 +1,15 @@
 import requests
 import json
 import re
+import sys
 
 
 def translate(word):
     key = '716426270'
     keyFrom = 'wufeifei'
-    url = 'http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=' + word
+    url = 'http://fanyi.youdao.com/openapi.do?keyfrom={keyfrom}&key={key}&type=data&doctype=json&version=1.1&q={word}'.format(keyfrom=keyFrom,
+                                                                                                                              key=key,
+                                                                                                                              word=word)
     r = requests.get(url)
     r_dict = json.loads(r.text)
     try:
@@ -45,22 +48,16 @@ def translate(word):
 
 
 def reply(msg):
-    print(msg)
-
-    # if '米酱' in msg:
-    #     reply_text = '米酱爱你哦！'
-    # else:
-    #     reply_text = '哼！'
-    if '翻译' in msg:
-        re_result = re.findall('[A-Za-z]+$', msg)
-        print(re_result)
-        word = re_result[0] if len(re_result) >= 1 else None
-        if word:
-            reply_text = translate(word)
-            return reply_text
-        else:
-            return
+    re_result = re.findall('[A-Za-z]+$', msg)
+    # print(re_result)
+    word = re_result[0] if len(re_result) >= 1 else None
+    if word:
+        reply_text = translate(word)
+        return reply_text
     else:
         return
 
-    # return reply_text
+
+if __name__ == '__main__':
+    msg = sys.argv[1]
+    print(reply(msg), end='')

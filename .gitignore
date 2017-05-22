@@ -1,0 +1,6 @@
+__pycache__/
+__init__.py
+*.cs
+*.exe
+reply.py
+update_id.json

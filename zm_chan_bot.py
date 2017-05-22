@@ -3,19 +3,39 @@ import json
 import socket
 import pprint
 import time
-from reply import reply
-# import socks
-# socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 1080)
-# socket.socket = socks.socksocket
+import glob
+# from reply import reply
+import importlib
 
 
-def handle(msg, chat_room, s, token):
-    reply_text = reply(msg)
-    if reply_text:
-        url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
-        s.get(url.format(token, chat_room, reply_text))
-    else:
-        pass
+def import_plugins():
+    plugin_str_list_ = [plugin.replace('/', '.') for plugin in glob.glob('plugins/*.py') if '/__' not in plugin]
+    print(plugin_str_list_)
+    plugin_str_list = [plugin.replace('.py', '') for plugin in plugin_str_list_]
+    plugins = [importlib.import_module(plugin_str) for plugin_str in plugin_str_list]
+    # print([plugin.reply('翻译two') for plugin in plugins])
+    return plugins
+
+
+def get_handle_func():
+    plugins = import_plugins()
+
+    def handle_(msg, chat_room, s, token):
+        reply_text_list_ = [plugin.reply(msg) for plugin in plugins]
+        reply_text_list = [text for text in reply_text_list_ if text]
+        if reply_text_list:
+            reply_text = reply_text_list[0]
+        else:
+            reply_text = None
+            # reply_text = reply_text_ if reply_text_ else None
+        if reply_text:
+            print(reply_text)
+            url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
+            s.get(url.format(token, chat_room, reply_text))
+        else:
+            pass
+
+    return handle_
 
 
 def get_updates(s, offset, token):
@@ -28,13 +48,15 @@ def get_updates(s, offset, token):
 
 def allow_reply(result):
     msg = result['message'].get('text')
-    # i['message']['from'].get('username') == 'bjong' and\
     if msg:
-        if ('@zm_chan_bot' in msg or msg.startswith('米酱')) or\
-           (
-               result['message']['chat']['type'] == 'private' and
-               result['message']['from'].get('username') == 'bjong'
-           ):
+        if (
+                '@zm_chan_bot' in msg or '米酱' in msg and
+                result['message']['chat']['type'] == 'supergroup'
+        ) or\
+        (
+            result['message']['chat']['type'] == 'private' and
+            result['message']['from'].get('username') == 'bjong'
+        ):
             return True
         else:
             return False
@@ -43,7 +65,7 @@ def allow_reply(result):
         return False
 
 
-def loop(s, offset, token):
+def loop(s, offset, token, handle):
     while True:
         try:
             history = get_updates(s, offset, token)
@@ -84,7 +106,8 @@ def zm_chan_bot_start(cfg):
     # else:
     #     offset = 0
     print(offset)
-    loop(s, offset, token)
+    handle = get_handle_func()
+    loop(s, offset, token, handle)
 
 
 def get_cfg():
