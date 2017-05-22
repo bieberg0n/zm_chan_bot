@@ -48,14 +48,17 @@ def translate(word):
 
 
 def reply(msg):
-    re_result = re.findall('[A-Za-z]+$', msg)
-    # print(re_result)
-    word = re_result[0] if len(re_result) >= 1 else None
-    if word:
-        reply_text = translate(word)
-        return reply_text
+    if '翻译' in msg:
+        re_result = re.findall('[A-Za-z]+$', msg)
+        # print(re_result)
+        word = re_result[0] if len(re_result) >= 1 else None
+        if word:
+            reply_text = translate(word)
+            return reply_text
+        else:
+            return
     else:
-        return
+        pass
 
 
 if __name__ == '__main__':
