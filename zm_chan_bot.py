@@ -6,6 +6,7 @@ import time
 import glob
 # from reply import reply
 import importlib
+import cron
 
 
 def import_plugins():
@@ -13,8 +14,21 @@ def import_plugins():
     print(plugin_str_list_)
     plugin_str_list = [plugin.replace('.py', '') for plugin in plugin_str_list_]
     plugins = [importlib.import_module(plugin_str) for plugin_str in plugin_str_list]
-    # print([plugin.reply('翻译two') for plugin in plugins])
     return plugins
+
+
+def send(s, token, chat_room, send_msg):
+    url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
+    s.get(url.format(token, chat_room, send_msg))
+
+
+def cron_reply(s, token, chat_room, cron_gen):
+    msg = next(cron_gen)
+    if msg:
+        print(msg)
+        send(s, token, chat_room, msg)
+    else:
+        pass
 
 
 def get_handle_func():
@@ -27,11 +41,9 @@ def get_handle_func():
             reply_text = reply_text_list[0]
         else:
             reply_text = None
-            # reply_text = reply_text_ if reply_text_ else None
         if reply_text:
             print(reply_text)
-            url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
-            s.get(url.format(token, chat_room, reply_text))
+            send(s, token, chat_room, reply_text)
         else:
             pass
 
@@ -65,7 +77,9 @@ def allow_reply(result):
         return False
 
 
-def loop(s, offset, token, handle):
+def loop(s, offset, token):
+    handle = get_handle_func()
+    cron_gen = cron.cron()
     while True:
         try:
             history = get_updates(s, offset, token)
@@ -86,6 +100,7 @@ def loop(s, offset, token, handle):
                 pass
 
         offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
+        cron_reply(s, token, 228267026, cron_gen)
         time.sleep(1)
 
 
@@ -95,19 +110,11 @@ def zm_chan_bot_start(cfg):
     s.proxies = {'http': 'socks5://127.0.0.1:1080',
                  'https': 'socks5://127.0.0.1:1080'}
 
-    # r = s.get(url.format(token, offset))
-    # json_ = r.content.decode()
-    # history = json.loads(json_)
     history = get_updates(s, 0, token)
     pprint.pprint(history)
     offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
-    # if len(history['result']) >= 1:
-    #     offset = history['result'][-1]['update_id']
-    # else:
-    #     offset = 0
     print(offset)
-    handle = get_handle_func()
-    loop(s, offset, token, handle)
+    loop(s, offset, token)
 
 
 def get_cfg():
