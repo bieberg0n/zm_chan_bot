@@ -11,7 +11,11 @@ def translate(word):
                                                                                                                               key=key,
                                                                                                                               word=word)
     r = requests.get(url)
-    r_dict = json.loads(r.text)
+    try:
+        r_dict = json.loads(r.text)
+    except ValueError:
+        print(r.text)
+        return None
     try:
         u = r_dict['basic']['us-phonetic'] # English
         e = r_dict['basic']['uk-phonetic']

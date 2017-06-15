@@ -54,7 +54,10 @@ def get_updates(s, offset, token):
     url = 'https://api.telegram.org/bot{}/getUpdates?offset={}'
     r = s.get(url.format(token, offset))
     json_ = r.content.decode()
-    history = json.loads(json_)
+    try:
+        history = json.loads(json_)
+    except ValueError:
+        return get_updates(s, offset, token)
     return history
 
 
