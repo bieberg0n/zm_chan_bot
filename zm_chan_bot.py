@@ -19,7 +19,8 @@ def import_plugins():
 
 def send(s, token, chat_room, send_msg):
     url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
-    s.get(url.format(token, chat_room, send_msg))
+    r = s.get(url.format(token, chat_room, send_msg))
+    return r.text
 
 
 def cron_reply(s, token, chat_room, cron_gen):
@@ -31,11 +32,14 @@ def cron_reply(s, token, chat_room, cron_gen):
         pass
 
 
-def get_handle_func():
+def get_handle_func(s, token):
     plugins = import_plugins()
 
-    def handle_(msg, chat_room, s, token):
-        reply_text_list_ = [plugin.reply(msg) for plugin in plugins]
+    def handle(result):
+        msg = result['message'].get('text')
+        chat_room = result['message']['chat']['id']
+
+        reply_text_list_ = [plugin.reply(result) for plugin in plugins]
         reply_text_list = [text for text in reply_text_list_ if text]
         if reply_text_list:
             reply_text = reply_text_list[0]
@@ -47,7 +51,7 @@ def get_handle_func():
         else:
             pass
 
-    return handle_
+    return handle
 
 
 def get_updates(s, offset, token):
@@ -69,8 +73,8 @@ def allow_reply(result):
                 result['message']['chat']['type'] == 'supergroup'
         ) or\
         (
-            result['message']['chat']['type'] == 'private' and
-            result['message']['from'].get('username') == 'bjong'
+            result['message']['chat']['type'] == 'private'# and
+            # result['message']['from'].get('username') == 'bjong'
         ):
             return True
         else:
@@ -81,24 +85,25 @@ def allow_reply(result):
 
 
 def loop(s, offset, token):
-    handle = get_handle_func()
+    handle = get_handle_func(s, token)
     cron_gen = cron.cron()
+
     while True:
         try:
             history = get_updates(s, offset, token)
         except requests.exceptions.ConnectionError:
             continue
 
-        result = history['result']
-        for i in result:
-            if i['update_id'] > offset and i.get('message'):
-                pprint.pprint(i)
-                msg = i['message'].get('text')
-                if allow_reply(i):
-                    chat_room = i['message']['chat']['id']
-                    handle(msg, chat_room, s, token)
-                else:
-                    pass
+        result_list = history['result']
+        for result in result_list:
+            if result['update_id'] > offset and result.get('message'):
+                pprint.pprint(result)
+                # msg = result['message'].get('text')
+                # if allow_reply(result):
+                # chat_room = result['message']['chat']['id']
+                handle(result)
+                # else:
+                #     pass
             else:
                 pass
 

@@ -3,4 +3,5 @@ __init__.py
 *.cs
 *.exe
 reply.py
-update_id.json
+*.json
+test.py

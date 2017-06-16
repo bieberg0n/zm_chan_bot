@@ -8,28 +8,38 @@ def is_hello(msg):
         return False
 
 
-def reply(msg):
-    history.append(msg)
+def allow_reply(result):
+    return result['message']['from'].get('username') == 'bjong'
 
-    if len(history) >= 4 and is_hello(history[-4]) and\
-       is_hello(history[-3]) and\
-       is_hello(history[-2]) and is_hello(history[-1]):
+
+def reply(result):
+
+    if not allow_reply(result):
         return
-    else:
-        pass
-
-    if len(history) >= 3 and is_hello(history[-3]) and\
-       is_hello(history[-2]) and is_hello(history[-1]):
-        return '......'
 
     else:
-        pass
+        msg = result['message'].get('text')
+        history.append(msg)
 
-    if is_hello(msg):
-        return '嗯？'
+        if len(history) >= 4 and is_hello(history[-4]) and\
+           is_hello(history[-3]) and\
+           is_hello(history[-2]) and is_hello(history[-1]):
+            return
+        else:
+            pass
 
-    else:
-        pass
+        if len(history) >= 3 and is_hello(history[-3]) and\
+           is_hello(history[-2]) and is_hello(history[-1]):
+            return '......'
+
+        else:
+            pass
+
+        if is_hello(msg):
+            return '嗯？'
+
+        else:
+            pass
 
 
 
