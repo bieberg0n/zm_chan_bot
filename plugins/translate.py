@@ -54,9 +54,8 @@ def translate(word):
 def reply(result):
     msg = result['message'].get('text')
 
-    if '翻译' in msg:
+    if '翻译' in msg or re.findall('\\.[A-Za-z]+$', msg):
         re_result = re.findall('[A-Za-z]+$', msg)
-        # print(re_result)
         word = re_result[0] if len(re_result) >= 1 else None
         if word:
             reply_text = translate(word)

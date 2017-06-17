@@ -15,9 +15,13 @@ S.proxies = {'http': 'socks5://127.0.0.1:1080',
 
 
 def str_to_dict(string):
-    # try:
-    dict_ = json.loads(string)
-    return dict_
+    try:
+        dict_ = json.loads(string)
+    except json.decoder.JSONDecodeError as e:
+        print(e)
+        return
+    else:
+        return dict_
 
 
 async def handle(reader_c, writer_c):

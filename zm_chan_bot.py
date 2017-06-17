@@ -4,9 +4,8 @@ import socket
 import pprint
 import time
 import glob
-# from reply import reply
 import importlib
-import cron
+# import cron
 
 
 def import_plugins():
@@ -21,15 +20,6 @@ def send(s, token, chat_room, send_msg):
     url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
     r = s.get(url.format(token, chat_room, send_msg))
     return r.text
-
-
-def cron_reply(s, token, chat_room, cron_gen):
-    msg = next(cron_gen)
-    if msg:
-        print(msg)
-        send(s, token, chat_room, msg)
-    else:
-        pass
 
 
 def get_handle_func(s, token):
@@ -86,7 +76,6 @@ def allow_reply(result):
 
 def loop(s, offset, token):
     handle = get_handle_func(s, token)
-    cron_gen = cron.cron()
 
     while True:
         try:
@@ -108,7 +97,6 @@ def loop(s, offset, token):
                 pass
 
         offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
-        cron_reply(s, token, 228267026, cron_gen)
         time.sleep(1)
 
 
