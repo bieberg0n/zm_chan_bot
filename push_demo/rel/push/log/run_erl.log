@@ -1,0 +1,8 @@
+run_erl [4144] Sun Jul  2 18:53:52 2017
+Args before exec of shell:
+run_erl [4144] Sun Jul  2 18:53:52 2017
+argv[0] = sh
+run_erl [4144] Sun Jul  2 18:53:52 2017
+argv[1] = -c
+run_erl [4144] Sun Jul  2 18:53:52 2017
+argv[2] = exec /home/bj/Documents/py/zm_chan_bot/push_demo/rel/push/bin/push console \'\' 
