@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import zm_chan_bot
 import asyncio
 import requests

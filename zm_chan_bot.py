@@ -78,26 +78,27 @@ def loop(s, offset, token):
     handle = get_handle_func(s, token)
 
     while True:
+        time.sleep(1)
         try:
             history = get_updates(s, offset, token)
-        except requests.exceptions.ConnectionError:
-            continue
+        except requests.exceptions.ConnectionError as e:
+            print(e)
 
-        result_list = history['result']
-        for result in result_list:
-            if result['update_id'] > offset and result.get('message'):
-                pprint.pprint(result)
-                # msg = result['message'].get('text')
-                # if allow_reply(result):
-                # chat_room = result['message']['chat']['id']
-                handle(result)
-                # else:
-                #     pass
-            else:
-                pass
+        else:
+            result_list = history['result']
+            for result in result_list:
+                if result['update_id'] > offset and result.get('message'):
+                    pprint.pprint(result)
+                    # msg = result['message'].get('text')
+                    if allow_reply(result):
+                    # chat_room = result['message']['chat']['id']
+                        handle(result)
+                    else:
+                        pass
+                else:
+                    pass
 
-        offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
-        time.sleep(1)
+            offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
 
 
 def zm_chan_bot_start(cfg):

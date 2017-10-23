@@ -1,3 +1,5 @@
+#! coding=utf-8
+
 import requests
 import json
 import socket
@@ -28,4 +30,4 @@ def push_weather(city_name):
     push_msg(json.dumps(data).encode())
 
 
-push_weather('绍兴')
+push_weather('兴宁')
