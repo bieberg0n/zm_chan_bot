@@ -78,7 +78,7 @@ def loop(s, offset, token):
     handle = get_handle_func(s, token)
 
     while True:
-        time.sleep(1)
+        time.sleep(1.5)
         try:
             history = get_updates(s, offset, token)
         except requests.exceptions.ConnectionError as e:
