@@ -1,11 +1,17 @@
 import requests
 import json
-import socket
+# import socket
+import sys
 import pprint
 import time
 import glob
 import importlib
-# import cron
+import threading
+from queue import Queue
+
+
+def log(*args):
+    print(*args)
 
 
 def import_plugins():
@@ -26,7 +32,7 @@ def get_handle_func(s, token):
     plugins = import_plugins()
 
     def handle(result):
-        msg = result['message'].get('text')
+        # msg = result['message'].get('text')
         chat_room = result['message']['chat']['id']
 
         reply_text_list_ = [plugin.reply(result) for plugin in plugins]
@@ -52,7 +58,8 @@ def get_updates(s, offset, token):
         history = json.loads(json_)
     except ValueError:
         return get_updates(s, offset, token)
-    return history
+    else:
+        return history
 
 
 def allow_reply(result):
@@ -74,35 +81,35 @@ def allow_reply(result):
         return False
 
 
+def get_msg_handle(s, offset_queue, token, handle):
+    offset = offset_queue.get()
+    history = get_updates(s, offset, token)
+
+    result_list = history['result']
+    for result in result_list:
+        if result['update_id'] > offset and result.get('message'):
+            pprint.pprint(result)
+            if allow_reply(result):
+                handle(result)
+
+    offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
+    offset_queue.put(offset)
+
+
 def loop(s, offset, token):
     handle = get_handle_func(s, token)
+    offset_queue = Queue()
+    offset_queue.put(offset)
 
     while True:
         time.sleep(1.5)
-        try:
-            history = get_updates(s, offset, token)
-        except requests.exceptions.ConnectionError as e:
-            print(e)
-
-        else:
-            result_list = history['result']
-            for result in result_list:
-                if result['update_id'] > offset and result.get('message'):
-                    pprint.pprint(result)
-                    # msg = result['message'].get('text')
-                    if allow_reply(result):
-                    # chat_room = result['message']['chat']['id']
-                        handle(result)
-                    else:
-                        pass
-                else:
-                    pass
-
-            offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
+        t = threading.Thread(target=get_msg_handle, args=(s, offset_queue, token, handle,))
+        t.start()
+        t.join()
 
 
-def zm_chan_bot_start(cfg):
-    token = cfg['token']
+def zm_chan_bot_start(token):
+    # token = cfg['token']
     s = requests.session()
     s.proxies = {'http': 'socks5://127.0.0.1:1080',
                  'https': 'socks5://127.0.0.1:1080'}
@@ -114,11 +121,13 @@ def zm_chan_bot_start(cfg):
     loop(s, offset, token)
 
 
-def get_cfg():
-    with open('update_id.json') as f:
-        cfg = json.loads(f.read())
-        return cfg
+# def get_cfg():
+#     with open('update_id.json') as f:
+#         cfg = json.loads(f.read())
+#         return cfg
 
 
 if __name__ == '__main__':
-    zm_chan_bot_start(get_cfg())
+    token = sys.argv[1]
+    # log(token)
+    zm_chan_bot_start(token)
