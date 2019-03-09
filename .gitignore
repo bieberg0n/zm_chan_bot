@@ -32,3 +32,6 @@ doc
 
 rel/example_project
 .concrete/DEV_MODE
+
+*.log
+*.log.*
