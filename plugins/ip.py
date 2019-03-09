@@ -17,7 +17,7 @@ def reply(result):
     if valid_ip(msg):
         # headers = {'User-Agent': 'curl/7.35.0'}
         # r = requests.get('http://ip.cn/?ip={}'.format(msg), headers=headers)
-        address_raw = subprocess.getoutput('qqwry {}'.format(msg))
+        address_raw = subprocess.getoutput('~/src/sh/qqwry {}'.format(msg))
         address = address_raw.split('\n')[-1]
         return address
     else:

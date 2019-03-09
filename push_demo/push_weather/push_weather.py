@@ -7,7 +7,7 @@ import socket
 
 def push_msg(msg):
     s = socket.socket()
-    s.connect(('a.bjong.me', 8800))
+    s.connect(('127.0.0.1', 8800))
     s.sendall(msg)
     s.close()
 

@@ -7,3 +7,5 @@ reply.py
 test.py
 deps/
 *.beam
+*.log
+*.log.*
