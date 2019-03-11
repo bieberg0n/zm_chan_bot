@@ -11,7 +11,7 @@ def reply(result):
     m = result['message']
     chat_id = m['chat']['id']
     time = m['date']
-    msg = m.get('text')
+    msg = m.get('text', m.get('caption'))
     msg_from = m['from']['first_name']
     if chat_id in config.need_save_chat_ids and msg:
         log('need save:', chat_id)
