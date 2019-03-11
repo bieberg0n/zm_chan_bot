@@ -35,3 +35,4 @@ rel/example_project
 
 *.log
 *.log.*
+config.py
