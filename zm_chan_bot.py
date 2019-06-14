@@ -12,10 +12,10 @@ import config
 from utils import info, log
 
 
-def import_plugins():
-    plugin_str_list_ = [plugin.replace('/', '.') for plugin in glob.glob('plugins/*.py') if '/__' not in plugin]
-    info(plugin_str_list_)
-    plugin_str_list = [plugin.replace('.py', '') for plugin in plugin_str_list_]
+def import_plugins(plugin_str_list):
+    # plugin_str_list_ = [plugin.replace('/', '.') for plugin in glob.glob('plugins/*.py') if '/__' not in plugin]
+    info(plugin_str_list)
+    plugin_str_list = ['plugins.' + p for p in plugin_str_list]
     plugins = [importlib.import_module(plugin_str) for plugin_str in plugin_str_list]
     return plugins
 
@@ -36,13 +36,13 @@ def allow_reply(result):
 
 
 class Bot:
-    def __init__(self, token):
+    def __init__(self, config):
         self.s = requests.session()
         self.s.proxies = {'http': 'socks5h://127.0.0.1:1080',
                           'https': 'socks5h://127.0.0.1:1080'}
 
-        self.token = token
-        self.plugins = import_plugins()
+        self.token = config.token
+        self.plugins = import_plugins(config.plugins)
         self.offset = 0
 
     def send(self, chat_room, send_msg):
@@ -103,5 +103,5 @@ class Bot:
 if __name__ == '__main__':
     # token = sys.argv[1]
     # cfg = config.token
-    bot = Bot(config.token)
+    bot = Bot(config)
     bot.start()

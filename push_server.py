@@ -28,8 +28,8 @@ def str_to_dict(string):
 
 
 class Handler:
-    def __init__(self, token):
-        self.bot = zm_chan_bot.Bot(token)
+    def __init__(self, config):
+        self.bot = zm_chan_bot.Bot(config)
 
     async def handle(self, reader_c, writer_c):
         try:
