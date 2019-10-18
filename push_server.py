@@ -5,17 +5,7 @@ import asyncio
 # import requests
 import sys
 import json
-
-# _cfg = zm_chan_bot.get_cfg()
-# TOKEN = _cfg.get('token')
-# S = requests.session()
-# S.proxies = {'http': 'socks5://127.0.0.1:1080',
-#              'https': 'socks5://127.0.0.1:1080'}
-
-
-# def push(s, token, id, msg):
-#     zm_chan_bot.send(S, )
-
+import config
 
 def str_to_dict(string):
     try:
@@ -28,7 +18,7 @@ def str_to_dict(string):
 
 
 class Handler:
-    def __init__(self, config):
+    def __init__(self):
         self.bot = zm_chan_bot.Bot(config)
 
     async def handle(self, reader_c, writer_c):
@@ -55,11 +45,8 @@ class Handler:
 
 
 if __name__ == '__main__':
-    token = sys.argv[1]
-    # bot = zm_chan_bot.Bot(token)
-    handler = Handler(token)
-
     loop = asyncio.get_event_loop()
+    handler = Handler()
     core = asyncio.start_server(handler.handle, '0.0.0.0', 8800, loop=loop)
     server = loop.run_until_complete(core)
     loop.run_forever()

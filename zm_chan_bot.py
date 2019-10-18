@@ -46,8 +46,9 @@ class Bot:
         self.offset = 0
 
     def send(self, chat_room, send_msg):
-        url = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'
-        r = self.s.get(url.format(self.token, chat_room, send_msg))
+        p = {'chat_id': chat_room, 'text': send_msg}
+        url = 'https://api.telegram.org/bot{}/sendMessage'.format(self.token)
+        r = self.s.get(url, params=p)
         return r.text
 
     def handle(self, result):
