@@ -14,8 +14,8 @@ def reply(result):
 
     msg = result['message'].get('text')
     msg = msg.replace('@zm_chan_bot', '').replace(' ', '')
-    if allow_reply(result) and msg.startswith('~/') and msg.endswith('/'):
-        result = client.query('select * from \"{}\" where msg={}'.format(chat_id, msg))
+    if allow_reply(result) and len(msg) > 1 and msg.startswith('~'):
+        result = client.query('select * from \"{}\" where msg=~/.*{}.*/'.format(chat_id, msg[1:]))
         his_msgs = list(result.get_points())
         his_msg_list = ['{} {}: {}'.format(i['time'], i['from'], i['msg']) for i in his_msgs]
         return '\n'.join(his_msg_list)
