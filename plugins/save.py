@@ -13,7 +13,10 @@ def reply(result):
     chat_id = m['chat']['id']
 
     msg = result['message'].get('text')
+    if msg is None:
+        return
     msg = msg.replace('@zm_chan_bot', '').replace(' ', '')
+
     if allow_reply(result) and len(msg) > 1 and msg.startswith('~'):
         result = client.query('select * from \"{}\" where msg=~/.*{}.*/'.format(chat_id, msg[1:]))
         his_msgs = list(result.get_points())
