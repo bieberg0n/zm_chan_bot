@@ -1,3 +1,5 @@
+proxy_port = '1080'
+
 token = ''
 debug = False
 
@@ -16,3 +18,6 @@ influxdb = {
     'password': '',
     'database': '',
 }
+
+# ssr_gate
+ssr_gate_url = ''
