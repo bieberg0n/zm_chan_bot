@@ -2,10 +2,7 @@
 
 import requests
 import json
-# import sys
-# import pprint
 import time
-import glob
 import importlib
 import threading
 import config
@@ -13,23 +10,25 @@ from utils import info, log
 
 
 def import_plugins(plugin_str_list):
-    # plugin_str_list_ = [plugin.replace('/', '.') for plugin in glob.glob('plugins/*.py') if '/__' not in plugin]
     info(plugin_str_list)
     plugin_str_list = ['plugins.' + p for p in plugin_str_list]
     plugins = [importlib.import_module(plugin_str) for plugin_str in plugin_str_list]
     return plugins
 
 
-def allow_reply(result):
+def msg_from_result(result):
     msg = result['message'].get('text')
-    if msg:
-        return (
-                '@zm_chan_bot' in msg
-                # and
-                # result['message']['chat']['type'] == 'supergroup'
-        ) or (
-            result['message']['chat']['type'] == 'private'
-        )
+    return msg
+
+
+def allow_reply(result, cond=None):
+    msg = msg_from_result(result)
+    if msg and ('@zm_chan_bot' in msg) or (result['message']['chat']['type'] == 'private'):
+        msg = msg.replace('@zm_chan_bot', '').strip(' ')
+        if cond:
+            return cond(msg)
+        else:
+            return True
 
     else:
         return False
@@ -52,7 +51,6 @@ class Bot:
         return r.text
 
     def handle(self, result):
-        # info(result)
         chat_room = result['message']['chat']['id']
 
         reply_text_list = [plugin.reply(result) for plugin in self.plugins]
@@ -67,11 +65,7 @@ class Bot:
         url = 'https://api.telegram.org/bot{}/getUpdates?offset={}'
         r = self.s.get(url.format(self.token, self.offset))
         json_ = r.content.decode()
-        # try:
         history = json.loads(json_)
-        # except ValueError:
-        #     return self.get_updates()
-        # else:
         return history
 
     def get_msg_handle(self):
@@ -81,7 +75,6 @@ class Bot:
         for result in result_list:
             if result['update_id'] > self.offset and result.get('message'):
                 info(result)
-                # and allow_reply(result):
                 self.handle(result)
 
         self.offset = history['result'][-1]['update_id'] if len(history['result']) >= 1 else 0
@@ -102,7 +95,5 @@ class Bot:
 
 
 if __name__ == '__main__':
-    # token = sys.argv[1]
-    # cfg = config.token
     bot = Bot(config)
     bot.start()
