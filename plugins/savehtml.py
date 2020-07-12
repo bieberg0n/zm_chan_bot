@@ -16,7 +16,7 @@ def reply(result):
     if not allow_reply(result, cond):
         return
 
-    msg = msg_from_result(result)
+    msg = msg_from_result(result, clear=True)
     key = 'save '
     url = msg[len(key):]
     log('url', url)

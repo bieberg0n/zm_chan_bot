@@ -16,15 +16,17 @@ def import_plugins(plugin_str_list):
     return plugins
 
 
-def msg_from_result(result):
+def msg_from_result(result, clear=False):
     msg = result['message'].get('text')
+    if clear:
+        msg = msg.replace('@zm_chan_bot', '').strip(' ')
     return msg
 
 
 def allow_reply(result, cond=None):
     msg = msg_from_result(result)
     if msg and ('@zm_chan_bot' in msg) or (result['message']['chat']['type'] == 'private'):
-        msg = msg.replace('@zm_chan_bot', '').strip(' ')
+        msg = msg_from_result(result, clear=True)
         if cond:
             return cond(msg)
         else:
