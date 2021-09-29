@@ -3,4 +3,4 @@ requests[socks]
 gunicorn
 influxdb
 easyquotation
-
+flask
