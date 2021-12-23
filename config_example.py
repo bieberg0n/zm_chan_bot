@@ -1,4 +1,4 @@
-proxy_port = '1080'
+proxy = '127.0.0.1:1080'
 
 token = ''
 debug = False

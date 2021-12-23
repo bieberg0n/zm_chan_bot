@@ -39,8 +39,8 @@ def allow_reply(result, cond=None):
 class Bot:
     def __init__(self, config):
         self.s = requests.session()
-        self.s.proxies = {'http': 'socks5h://127.0.0.1:{}'.format(config.proxy_port),
-                          'https': 'socks5h://127.0.0.1:{}'.format(config.proxy_port)}
+        self.s.proxies = {'http': 'socks5h://{}'.format(config.proxy),
+                          'https': 'socks5h://{}'.format(config.proxy)}
 
         self.token = config.token
         self.plugins = import_plugins(config.plugins)
