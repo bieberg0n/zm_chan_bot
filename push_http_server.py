@@ -2,11 +2,13 @@ from flask import (
 Flask,
 request,
 )
+from flask_cors import CORS
 import zm_chan_bot
 import config
 
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 bot = zm_chan_bot.Bot(config)
 
 
