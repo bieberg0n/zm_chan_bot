@@ -14,7 +14,7 @@ bot = zm_chan_bot.Bot(config)
 def index():
     data = request.get_json()
     print('data:', data)
-    bot.send(data['id'], data['msg'])
+    bot.send(data)
     return '', 204
 
 

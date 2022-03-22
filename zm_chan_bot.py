@@ -52,6 +52,16 @@ class Bot:
         r = self.s.get(url, params=p)
         return r.text
 
+    def send_v2(self, req):
+        p = dict(
+            chat_id=req['id'],
+            text=req['msg'],
+        )
+        p.update(req)
+        url = 'https://api.telegram.org/bot{}/sendMessage'.format(self.token)
+        r = self.s.get(url, params=p)
+        return r.text
+
     def handle(self, result):
         chat_room = result['message']['chat']['id']
 
